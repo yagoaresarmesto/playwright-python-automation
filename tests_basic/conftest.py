@@ -10,3 +10,4 @@ def practice_page(page: Page):
     yield page
 
     print("\n>>> TEARDOWN")
+

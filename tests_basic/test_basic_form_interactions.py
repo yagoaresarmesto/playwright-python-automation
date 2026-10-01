@@ -1,8 +1,9 @@
 from playwright.sync_api import Page, expect
+from pathlib import Path
 
 
 def test_basic_form_interactions(practice_page: Page):
-        practice_page.goto("/practice.html")
+        page = practice_page
 
         # TEXT INPUTS
 
@@ -17,9 +18,9 @@ def test_basic_form_interactions(practice_page: Page):
         # En este caso usamos get_by_label() porque el campo tiene
         # un label asociado y expresa claramente cómo lo identifica el usuario.
 
-        name_input = practice_page.get_by_label("Name", exact=True)
-        email_input = practice_page.get_by_label("Email", exact=True)
-        address_input = practice_page.get_by_label("Address", exact=True)
+        name_input = page.get_by_label("Name", exact=True)
+        email_input = page.get_by_label("Email", exact=True)
+        address_input = page.get_by_label("Address", exact=True)
 
         # fill() introduce o reemplaza el contenido del campo.
         name_input.fill("Yago")
@@ -36,8 +37,8 @@ def test_basic_form_interactions(practice_page: Page):
 
         # RADIO BUTTON
 
-        gender_male = practice_page.get_by_label("Male", exact=True)
-        gender_female = practice_page.get_by_label("Female", exact=True)
+        gender_male = page.get_by_label("Male", exact=True)
+        gender_female = page.get_by_label("Female", exact=True)
 
         # check() selecciona el radio button.
         gender_male.check()
@@ -48,7 +49,7 @@ def test_basic_form_interactions(practice_page: Page):
 
         # CHECKBOX
 
-        checkbox_sunday = practice_page.get_by_label("Sunday", exact=True)
+        checkbox_sunday = page.get_by_label("Sunday", exact=True)
 
         # Marcamos el checkbox y verificamos su estado.
         checkbox_sunday.check()
@@ -60,7 +61,7 @@ def test_basic_form_interactions(practice_page: Page):
 
         # DROPDOWN / SELECT
 
-        country_dropdown = practice_page.get_by_label("Select Country", exact=True)
+        country_dropdown = page.get_by_label("Select Country", exact=True)
 
         # Seleccionamos una opción utilizando el atributo value del <option>.
         country_dropdown.select_option("united-kingdom")
@@ -75,12 +76,12 @@ def test_basic_form_interactions(practice_page: Page):
 
         # Utilizamos data-testid porque en la página existen varios botones
         # con el texto "Submit" y queremos identificar este de forma inequívoca.
-        submit_button = practice_page.get_by_test_id("btn-submit-text-inputs")
+        submit_button = page.get_by_test_id("btn-submit-text-inputs")
         submit_button.click()
 
         # RESULTADO DEL FORMULARIO
 
-        status = practice_page.get_by_test_id("text-inputs-status")
+        status = page.get_by_test_id("text-inputs-status")
 
         # Comprueba el texto que contiene el elemento:
         expect(status).to_have_text("submitted")
@@ -90,14 +91,14 @@ def test_basic_form_interactions(practice_page: Page):
         expect(status).to_have_attribute("data-invalid-count", "0")
 
 def test_required_fields_validation(practice_page: Page):
-    practice_page.goto("/practice.html")
+    page = practice_page
 
-    submit_button = practice_page.get_by_test_id("btn-submit-text-inputs")
+    submit_button = page.get_by_test_id("btn-submit-text-inputs")
     submit_button.click()
 
-    name_error = practice_page.get_by_test_id("error-name")
-    email_error = practice_page.get_by_test_id("error-email")
-    address_error = practice_page.get_by_test_id("error-address")
+    name_error = page.get_by_test_id("error-name")
+    email_error = page.get_by_test_id("error-email")
+    address_error = page.get_by_test_id("error-address")
 
     expect(name_error).to_be_visible()
     expect(name_error).to_have_text("Name is required.")
@@ -107,3 +108,18 @@ def test_required_fields_validation(practice_page: Page):
 
     expect(address_error).to_be_visible()
     expect(address_error).to_have_text("Address is required.")
+
+def test_single_file_upload(practice_page: Page):
+    page = practice_page
+
+    upload_input = page.get_by_label("Upload Single File")
+    file_path = Path("test_data/sample_upload.txt")
+
+    upload_input.set_input_files(file_path)
+
+    selected_file = page.get_by_test_id("upload-single-result")
+    upload_status = page.get_by_test_id("upload-single-status")
+
+    expect(selected_file).to_have_text("sample_upload.txt")
+    expect(upload_status).to_be_visible()
+    expect(upload_status).to_have_text("✓ File Uploaded Successfully")
