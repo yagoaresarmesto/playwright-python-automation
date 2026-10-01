@@ -123,3 +123,22 @@ def test_single_file_upload(practice_page: Page):
     expect(selected_file).to_have_text("sample_upload.txt")
     expect(upload_status).to_be_visible()
     expect(upload_status).to_have_text("✓ File Uploaded Successfully")
+
+def test_multiple_files_upload(practice_page: Page):
+    page = practice_page
+
+    upload_input = page.get_by_label("Upload Multiple Files")
+    file_path = Path("test_data/sample_upload.txt")
+    file_path2 = Path("test_data/sample_upload2.txt")
+
+    upload_input.set_input_files([file_path, file_path2])
+
+    count_files= page.get_by_test_id("upload-multiple-count")
+    selected_files = page.get_by_test_id("upload-multiple-result")
+    upload_status = page.get_by_test_id("upload-multiple-status")
+
+
+    expect(count_files).to_have_text("2")
+    expect(selected_files).to_have_text("sample_upload.txt, sample_upload2.txt")
+    expect(upload_status).to_be_visible()
+    expect(upload_status).to_have_text("✓ 2 Files Uploaded Successfully")
