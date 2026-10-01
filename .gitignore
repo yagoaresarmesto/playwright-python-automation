@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Pytest cache
+.pytest_cache/
+
+# PyCharm
+.idea/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+
+# Downloaded browser files
+chrome-win64.zip
