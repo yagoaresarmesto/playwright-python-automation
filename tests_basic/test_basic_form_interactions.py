@@ -1,6 +1,8 @@
 from playwright.sync_api import Page, expect
 from pathlib import Path
 
+from pages.file_handling_page import FileHandlingPage
+
 
 # MODULE 1 — Form Controls | Text Inputs, Radio Buttons, Checkboxes y Dropdown
 # Verifica las interacciones básicas y el envío correcto del formulario.
@@ -119,20 +121,21 @@ def test_required_fields_validation(practice_page: Page):
 # MODULE 3 — File Handling | Single File Upload
 # Verifica la selección de un archivo y el mensaje de éxito.
 def test_single_file_upload(practice_page: Page):
-    page = practice_page
+    file_handling = FileHandlingPage(practice_page)
 
-    upload_input = page.get_by_label("Upload Single File")
     file_path = Path("test_data/sample_upload.txt")
 
-    upload_input.set_input_files(file_path)
 
-    selected_file = page.get_by_test_id("upload-single-result")
-    upload_status = page.get_by_test_id("upload-single-status")
+    file_handling.single_upload.set_input_files(file_path)
 
-    expect(selected_file).to_have_text("sample_upload.txt")
-    expect(upload_status).to_be_visible()
-    expect(upload_status).to_have_text("✓ File Uploaded Successfully")
+    expect(file_handling.single_result).to_have_text(
+        "sample_upload.txt"
+    )
 
+    expect(file_handling.single_status).to_be_visible()
+    expect(file_handling.single_status).to_have_text(
+        "✓ File Uploaded Successfully"
+    )
 
 # MODULE 3 — File Handling | Multiple File Upload
 # Verifica la cantidad, los nombres y el estado de dos archivos seleccionados.
