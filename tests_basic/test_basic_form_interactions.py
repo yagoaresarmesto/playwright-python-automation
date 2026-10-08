@@ -2,6 +2,8 @@ from playwright.sync_api import Page, expect
 from pathlib import Path
 
 
+# MODULE 1 — Form Controls | Text Inputs, Radio Buttons, Checkboxes y Dropdown
+# Verifica las interacciones básicas y el envío correcto del formulario.
 def test_basic_form_interactions(practice_page: Page):
         page = practice_page
 
@@ -11,7 +13,7 @@ def test_basic_form_interactions(practice_page: Page):
         #
         # page.get_by_label("Name", exact=True)
         # page.get_by_placeholder("Enter your name")
-        # page.get_by_test_id("input-name")z
+        # page.get_by_test_id("input-name")
         # page.locator("#name")
         # page.locator('input[name="name"]')
         #
@@ -90,6 +92,10 @@ def test_basic_form_interactions(practice_page: Page):
         expect(status).to_have_attribute("data-status", "submitted")
         expect(status).to_have_attribute("data-invalid-count", "0")
 
+
+# MODULE 1 — Form Controls | Text Inputs
+# Verifica los mensajes de validación al enviar los campos obligatorios vacíos.
+
 def test_required_fields_validation(practice_page: Page):
     page = practice_page
 
@@ -109,6 +115,9 @@ def test_required_fields_validation(practice_page: Page):
     expect(address_error).to_be_visible()
     expect(address_error).to_have_text("Address is required.")
 
+
+# MODULE 3 — File Handling | Single File Upload
+# Verifica la selección de un archivo y el mensaje de éxito.
 def test_single_file_upload(practice_page: Page):
     page = practice_page
 
@@ -124,6 +133,9 @@ def test_single_file_upload(practice_page: Page):
     expect(upload_status).to_be_visible()
     expect(upload_status).to_have_text("✓ File Uploaded Successfully")
 
+
+# MODULE 3 — File Handling | Multiple File Upload
+# Verifica la cantidad, los nombres y el estado de dos archivos seleccionados.
 def test_multiple_files_upload(practice_page: Page):
     page = practice_page
 
@@ -133,7 +145,7 @@ def test_multiple_files_upload(practice_page: Page):
 
     upload_input.set_input_files([file_path, file_path2])
 
-    count_files= page.get_by_test_id("upload-multiple-count")
+    count_files = page.get_by_test_id("upload-multiple-count")
     selected_files = page.get_by_test_id("upload-multiple-result")
     upload_status = page.get_by_test_id("upload-multiple-status")
 
@@ -142,3 +154,36 @@ def test_multiple_files_upload(practice_page: Page):
     expect(selected_files).to_have_text("sample_upload.txt, sample_upload2.txt")
     expect(upload_status).to_be_visible()
     expect(upload_status).to_have_text("✓ 2 Files Uploaded Successfully")
+
+
+# MODULE 3 — File Handling | Single File Upload — Reset
+# Verifica que Reset limpia el archivo seleccionado, el mensaje y el input.
+def test_single_file_upload_reset(practice_page: Page):
+    page = practice_page
+
+    upload_input = page.get_by_label(
+        "Upload Single File",
+        exact=True
+    )
+
+    file_path = Path("test_data/sample_upload.txt")
+
+    upload_input.set_input_files(file_path)
+
+    # 1. Comprobar que el archivo se seleccionó.
+    selected_file = page.get_by_test_id("upload-single-result")
+    expect(selected_file).to_have_text("sample_upload.txt")
+
+    # 2. Pulsar Reset.
+
+    reset_button = page.get_by_test_id("btn-reset-single")
+    reset_button.click()
+
+    # 3. Comprobar que el formulario vuelve
+    #    a su estado inicial.
+    expect(selected_file).to_have_text("—")
+
+    upload_status = page.get_by_test_id("upload-single-status")
+    expect(upload_status).to_be_empty()
+
+    expect(upload_input).to_have_value("")
