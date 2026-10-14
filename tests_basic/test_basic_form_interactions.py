@@ -2,6 +2,7 @@ from playwright.sync_api import Page, expect
 from pathlib import Path
 
 from pages.file_handling_page import FileHandlingPage
+from pages.form_controls_page import FormControlsPage
 
 
 # MODULE 1 — Form Controls | Text Inputs, Radio Buttons, Checkboxes y Dropdown
@@ -118,6 +119,67 @@ def test_required_fields_validation(practice_page: Page):
     expect(address_error).to_have_text("Address is required.")
 
 
+
+# MODULE 1 — Form Controls | Show / Hide Elements
+# Verifica que el campo se oculta con Hide y vuelve a mostrarse con Show.
+def test_show_hide_element(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    expect(form_page.showhide_textbox).to_be_visible()
+
+    form_page.hide_element()
+
+    expect(form_page.showhide_textbox).to_be_hidden()
+
+    form_page.show_element()
+
+    expect(form_page.showhide_textbox).to_be_visible()
+
+
+# MODULE 1 — Form Controls | Show / Hide Elements — Hide dos veces
+# Verifica que la primera pulsación cambia el estado y la segunda no produce cambios.
+def test_hide_element_twice(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    expect(form_page.showhide_textbox).to_be_visible()
+
+    form_page.hide_element()
+
+    expect(form_page.showhide_status).to_have_attribute("data-outcome", "changed")
+
+    expect(form_page.showhide_textbox).to_be_hidden()
+
+    form_page.hide_element()
+
+    expect(form_page.showhide_status).to_have_attribute("data-outcome", "no-change")
+
+    expect(form_page.showhide_textbox).to_be_hidden()
+
+# Verifica que la primera pulsación cambia el estado y la segunda y tercera no produce cambios.
+def test_show_element_twice(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    expect(form_page.showhide_textbox).to_be_visible()
+
+    form_page.hide_element()
+
+    expect(form_page.showhide_status).to_have_attribute("data-outcome", "changed")
+
+    expect(form_page.showhide_textbox).to_be_hidden()
+
+    form_page.show_element()
+
+    expect(form_page.showhide_status).to_have_attribute("data-outcome", "changed")
+
+    expect(form_page.showhide_textbox).to_be_visible()
+
+    form_page.show_element()
+
+    expect(form_page.showhide_status).to_have_attribute("data-outcome", "no-change")
+
+    expect(form_page.showhide_textbox).to_be_visible()
+
+
 # MODULE 3 — File Handling | Single File Upload
 # Verifica la selección de un archivo y el mensaje de éxito.
 def test_single_file_upload(practice_page: Page):
@@ -186,6 +248,8 @@ def test_single_file_upload_reset(practice_page: Page):
     expect(file_handling.single_upload).to_have_value("")
 
 
+# MODULE 3 — File Handling | Multiple File Upload — Reset
+# Verifica que Reset limpia los nombres, el estado, el contador y el input múltiple.
 def test_multiple_files_upload_reset(practice_page: Page):
     file_handling = FileHandlingPage(practice_page)
 
@@ -204,5 +268,3 @@ def test_multiple_files_upload_reset(practice_page: Page):
     expect(file_handling.multiple_status).to_be_empty()
     expect(file_handling.multiple_count).to_have_text("0")
     expect(file_handling.multiple_upload).to_have_value("")
-
-
