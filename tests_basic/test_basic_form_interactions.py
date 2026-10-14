@@ -155,7 +155,8 @@ def test_hide_element_twice(practice_page: Page):
 
     expect(form_page.showhide_textbox).to_be_hidden()
 
-# Verifica que la primera pulsación cambia el estado y la segunda y tercera no produce cambios.
+# MODULE 1 — Form Controls | Show / Hide Elements — Show dos veces
+# Tras ocultar el campo, verifica que el primer Show lo muestra y el segundo no cambia su estado.
 def test_show_element_twice(practice_page: Page):
     form_page = FormControlsPage(practice_page)
 
@@ -180,6 +181,8 @@ def test_show_element_twice(practice_page: Page):
     expect(form_page.showhide_textbox).to_be_visible()
 
 
+# MODULE 1 — Form Controls | Hidden Elements & AJAX — Toggle Input Box 2
+# Comprueba el estado inicial y que cada pulsación alterna la visibilidad y el mensaje de estado.
 def test_toggle_input_box_2(practice_page: Page):
     form_page = FormControlsPage(practice_page)
 
@@ -205,6 +208,34 @@ def test_toggle_input_box_2(practice_page: Page):
         "Input Box 2 hidden"
     )
 
+
+# MODULE 1 — Form Controls | Hidden Elements & AJAX — Load AJAX Content
+# Comprueba el contenido inicial y espera el título insertado tras la carga asíncrona.
+def test_load_ajax_content(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    expect(form_page.ajax_status).to_have_text(
+        "Ready"
+    )
+
+    expect(form_page.ajax_content).to_have_text(
+        "No content loaded yet."
+    )
+
+    form_page.load_ajax_content()
+
+    expect(form_page.ajax_status).to_have_text(
+        "AJAX content loaded"
+    )
+
+    # Verificamos solo el título: el contenedor también incluye un párrafo.
+    # expect() reintenta la comprobación mientras aparece el contenido AJAX.
+    expect(form_page.ajax_loaded_heading).to_have_text(
+        "AJAX Content Loaded"
+    )
+
+# Alternativa menos específica: comprobar que el contenedor incluye el texto.
+# expect(form_page.ajax_content).to_contain_text("AJAX Content Loaded")
 
 # MODULE 3 — File Handling | Single File Upload
 # Verifica la selección de un archivo y el mensaje de éxito.
