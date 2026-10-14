@@ -180,6 +180,32 @@ def test_show_element_twice(practice_page: Page):
     expect(form_page.showhide_textbox).to_be_visible()
 
 
+def test_toggle_input_box_2(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    expect(form_page.ajax_input_2).to_be_hidden()
+
+    expect(form_page.ajax_status).to_have_text(
+        "Ready"
+    )
+
+    form_page.toggle_input_2()
+
+    expect(form_page.ajax_input_2).to_be_visible()
+
+    expect(form_page.ajax_status).to_have_text(
+        "Input Box 2 shown"
+    )
+
+    form_page.toggle_input_2()
+
+    expect(form_page.ajax_input_2).to_be_hidden()
+
+    expect(form_page.ajax_status).to_have_text(
+        "Input Box 2 hidden"
+    )
+
+
 # MODULE 3 — File Handling | Single File Upload
 # Verifica la selección de un archivo y el mensaje de éxito.
 def test_single_file_upload(practice_page: Page):
