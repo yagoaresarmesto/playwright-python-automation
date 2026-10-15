@@ -119,6 +119,48 @@ def test_required_fields_validation(practice_page: Page):
     expect(address_error).to_have_text("Address is required.")
 
 
+# MODULE 1 — Form Controls | Toggle Switches — Enable Notifications
+# Comprueba el estado inicial desmarcado y que el interruptor puede activarse y desactivarse.
+def test_toggle_notifications(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # El interruptor debe aparecer desmarcado al cargar la página.
+    expect(form_page.toggle_notifications).not_to_be_checked()
+
+    # Activarlo y verificar que queda marcado.
+    form_page.enable_notifications()
+    expect(form_page.toggle_notifications).to_be_checked()
+
+    # Desactivarlo y comprobar que vuelve al estado inicial.
+    form_page.disable_notifications()
+    expect(form_page.toggle_notifications).not_to_be_checked()
+
+
+# MODULE 1 — Form Controls | Toggle Switches — Email Alerts y Auto Save
+# Comprueba que los dos interruptores cambian de estado de forma independiente.
+def test_toggle_email_alerts_and_autosave(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Estado inicial: Email Alerts marcado y Auto Save desmarcado.
+    # No modificamos los controles antes de comprobar sus valores por defecto.
+    expect(form_page.toggle_email_alerts).to_be_checked()
+    expect(form_page.toggle_autosave).not_to_be_checked()
+
+    # Desactivar Email Alerts sin alterar el estado de Auto Save.
+    form_page.disable_email_alerts()
+    expect(form_page.toggle_email_alerts).not_to_be_checked()
+    expect(form_page.toggle_autosave).not_to_be_checked()
+
+    # Activar Auto Save y comprobar que Email Alerts continúa desmarcado.
+    form_page.enable_autosave()
+    expect(form_page.toggle_email_alerts).not_to_be_checked()
+    expect(form_page.toggle_autosave).to_be_checked()
+
+    # Reactivar Email Alerts y verificar que ambos quedan marcados.
+    form_page.enable_email_alerts()
+    expect(form_page.toggle_email_alerts).to_be_checked()
+    expect(form_page.toggle_autosave).to_be_checked()
+
 
 # MODULE 1 — Form Controls | Show / Hide Elements
 # Verifica que el campo se oculta con Hide y vuelve a mostrarse con Show.

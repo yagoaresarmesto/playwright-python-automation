@@ -23,6 +23,18 @@ class FormControlsPage:
             "showhide-log"
         )
 
+        #Toggle Switches
+        self.toggle_notifications = page.get_by_test_id(
+            "toggle-notifications"
+        )
+        self.toggle_email_alerts = page.get_by_test_id(
+            "toggle-email-alerts"
+        )
+
+        self.toggle_autosave = page.get_by_test_id(
+            "toggle-autosave"
+        )
+
         # Hidden Elements & AJAX: controles para alternar la visibilidad
         # del segundo input y consultar el estado de las acciones.
         self.toggle_input_2_button = page.get_by_test_id(
@@ -60,6 +72,25 @@ class FormControlsPage:
 
     def show_element(self):
         self.show_button.click()
+
+    # Toggle Switches
+    def enable_notifications(self):
+        self.toggle_notifications.check()
+
+    def disable_notifications(self):
+        self.toggle_notifications.uncheck()
+
+    def enable_email_alerts(self):
+        self.toggle_email_alerts.check()
+
+    def disable_email_alerts(self):
+        self.toggle_email_alerts.uncheck()
+
+    def enable_autosave(self):
+        self.toggle_autosave.check()
+
+    def disable_autosave(self):
+        self.toggle_autosave.uncheck()
 
     # Hidden Elements & AJAX: acciones; las assertions van en los tests.
     def toggle_input_2(self):
