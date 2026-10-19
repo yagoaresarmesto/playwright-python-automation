@@ -62,6 +62,23 @@ class FormControlsPage:
             "multiselect-colors"
         )
 
+        # TOOLTIP — LOCATORS
+
+        # Botón sobre el que pasamos el ratón para mostrar el tooltip.
+        self.tooltip_trigger = page.get_by_test_id(
+            "tooltip-trigger"
+        )
+
+        # Mensaje informativo que inicialmente está oculto.
+        self.tooltip_bubble = page.get_by_test_id(
+            "tooltip-bubble"
+        )
+
+        # Indicador que muestra "hidden" o "visible".
+        self.tooltip_state = page.get_by_test_id(
+            "tooltip-state"
+        )
+
         # HIDDEN ELEMENTS & AJAX — LOCATORS
         # Botón que alterna la visibilidad de Input Box 2.
         self.toggle_input_2_button = page.get_by_test_id(
@@ -154,6 +171,17 @@ class FormControlsPage:
             brands,
             timeout=timeout
         )
+
+    # TOOLTIP — ACCIONES
+
+    def show_tooltip(self):
+        # hover() mueve el cursor sobre el botón.
+        # Esto provoca que la página muestre el tooltip.
+        self.tooltip_trigger.hover()
+
+    def focus_tooltip(self):
+        # Coloca el foco del teclado sobre el botón sin utilizar el ratón.
+        self.tooltip_trigger.focus()
 
     # HIDDEN ELEMENTS & AJAX — ACCIONES
 

@@ -292,6 +292,111 @@ def test_multiselect_clear_selection(practice_page: Page):
     # La lista esperada también está vacía: no queda ninguna seleccionada.
     expect(form_page.multiselect_colors).to_have_values([])
 
+# MODULE 1 — Form Controls | Tooltip — Mostrar con hover
+# Comprueba que el tooltip aparece al pasar el ratón sobre el botón.
+def test_tooltip_on_hover(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Comprobamos que el mensaje del tooltip comienza oculto.
+    expect(form_page.tooltip_bubble).to_be_hidden()
+
+    # Verificamos que el indicador muestra el estado inicial "hidden".
+    expect(form_page.tooltip_state).to_have_text("hidden")
+
+    # Pasamos el cursor sobre el botón Delivery estimate.
+    # La acción hover() debe provocar que aparezca el tooltip.
+    form_page.show_tooltip()
+
+    # Comprobamos que el mensaje del tooltip es realmente visible.
+    expect(form_page.tooltip_bubble).to_be_visible()
+
+    # Verificamos que el mensaje informativo contiene el texto esperado.
+    expect(form_page.tooltip_bubble).to_have_text(
+        "Standard delivery takes 3–5 working days."
+    )
+
+    # Comprobamos que la aplicación actualiza el indicador a "visible".
+    expect(form_page.tooltip_state).to_have_text("visible")
+
+
+# MODULE 1 — Form Controls | Tooltip — Ocultar con mouseleave
+# Comprueba que el tooltip desaparece al retirar el cursor del botón.
+def test_tooltip_hide_on_mouse_leave(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Verificamos que el tooltip comienza oculto.
+    expect(form_page.tooltip_bubble).to_be_hidden()
+
+    # Pasamos el cursor sobre el botón para mostrar el tooltip.
+    form_page.show_tooltip()
+
+    # Comprobamos que el tooltip aparece y el indicador cambia a "visible".
+    expect(form_page.tooltip_bubble).to_be_visible()
+    expect(form_page.tooltip_state).to_have_text("visible")
+
+    # Movemos el cursor a la esquina superior izquierda de la ventana.
+    # Al abandonar el botón, se provoca el evento mouseleave.
+    practice_page.mouse.move(0, 0)
+
+    # Verificamos que el tooltip desaparece realmente.
+    expect(form_page.tooltip_bubble).to_be_hidden()
+
+    # Comprobamos que el indicador vuelve al estado "hidden".
+    expect(form_page.tooltip_state).to_have_text("hidden")
+
+
+# MODULE 1 — Form Controls | Tooltip — Mostrar con focus
+# Comprueba que el tooltip aparece cuando el botón recibe el foco.
+def test_tooltip_on_focus(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Comprobamos que el tooltip está oculto inicialmente.
+    expect(form_page.tooltip_bubble).to_be_hidden()
+
+    # Colocamos el foco directamente sobre el botón Delivery estimate.
+    # focus() no necesita mover el cursor del ratón.
+    form_page.focus_tooltip()
+
+    # Verificamos que el botón ha recibido el foco del teclado.
+    expect(form_page.tooltip_trigger).to_be_focused()
+
+    # Comprobamos que el tooltip aparece como consecuencia del foco.
+    expect(form_page.tooltip_bubble).to_be_visible()
+
+    # Verificamos que el indicador de estado cambia a "visible".
+    expect(form_page.tooltip_state).to_have_text("visible")
+
+
+# MODULE 1 — Form Controls | Tooltip — Ocultar al perder el foco
+# Comprueba que el tooltip desaparece al cambiar el foco mediante Tab.
+def test_tooltip_hide_on_blur(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Comprobamos que el tooltip comienza oculto.
+    expect(form_page.tooltip_bubble).to_be_hidden()
+
+    # Colocamos el foco sobre el botón Delivery estimate.
+    form_page.focus_tooltip()
+
+    # Verificamos que el botón ha recibido el foco.
+    expect(form_page.tooltip_trigger).to_be_focused()
+
+    # Comprobamos que el tooltip aparece y el indicador cambia a "visible".
+    expect(form_page.tooltip_bubble).to_be_visible()
+    expect(form_page.tooltip_state).to_have_text("visible")
+
+    # Simulamos la pulsación de Tab para avanzar al siguiente elemento
+    # interactivo y provocar que el botón Delivery estimate pierda el foco.
+    practice_page.keyboard.press("Tab")
+
+    # Verificamos que el botón ya no tiene el foco del teclado.
+    expect(form_page.tooltip_trigger).not_to_be_focused()
+
+    # Comprobamos que el mensaje del tooltip vuelve a ocultarse.
+    expect(form_page.tooltip_bubble).to_be_hidden()
+
+    # Verificamos que el indicador de estado vuelve a mostrar "hidden".
+    expect(form_page.tooltip_state).to_have_text("hidden")
 
 # MODULE 1 — Form Controls | Hidden Elements & AJAX — Toggle Input Box 2
 # Comprueba el estado inicial y que cada pulsación alterna la visibilidad y el mensaje de estado.
