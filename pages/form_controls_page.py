@@ -1,4 +1,3 @@
-
 from playwright.sync_api import Page
 
 
@@ -56,6 +55,13 @@ class FormControlsPage:
             "toggle-autosave"
         )
 
+        # MULTI SELECTS — LOCATORS
+        # Selector HTML con el atributo multiple: permite elegir varias opciones.
+        # Algunas marcas comparten texto visible, pero tienen valores distintos.
+        self.multiselect_colors = page.get_by_test_id(
+            "multiselect-colors"
+        )
+
         # HIDDEN ELEMENTS & AJAX — LOCATORS
         # Botón que alterna la visibilidad de Input Box 2.
         self.toggle_input_2_button = page.get_by_test_id(
@@ -91,6 +97,7 @@ class FormControlsPage:
         self.ajax_loaded_heading = page.get_by_test_id(
             "ajax-loaded-heading"
         )
+
 
     # SHOW / HIDE ELEMENTS — ACCIONES
     # click() reproduce la pulsación del usuario sobre un botón.
@@ -137,6 +144,17 @@ class FormControlsPage:
         # Desactiva el guardado automático.
         self.toggle_autosave.uncheck()
 
+    # MULTI SELECTS — ACCIONES
+    def select_clothing_brands(self, brands, timeout=None):
+        # Selecciona las opciones indicadas por sus atributos value.
+        # Una lista nueva sustituye la selección anterior; [] la limpia.
+        # timeout permite acortar la espera en tests de valores inexistentes.
+        # Con None se mantiene el timeout predeterminado de Playwright.
+        self.multiselect_colors.select_option(
+            brands,
+            timeout=timeout
+        )
+
     # HIDDEN ELEMENTS & AJAX — ACCIONES
 
     def toggle_input_2(self):
@@ -149,4 +167,3 @@ class FormControlsPage:
         # El test espera y verifica el contenido mediante expect(),
         # sin necesidad de utilizar time.sleep().
         self.load_ajax_button.click()
-

@@ -1,5 +1,8 @@
+import pytest
 from playwright.sync_api import Page, expect
 from pages.form_controls_page import FormControlsPage
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+
 
 # MODULE 1 — Form Controls | Text Inputs, Radio Buttons, Checkboxes y Dropdown
 # Verifica las interacciones básicas y el envío correcto del formulario.
@@ -219,6 +222,77 @@ def test_show_element_twice(practice_page: Page):
     expect(form_page.showhide_textbox).to_be_visible()
 
 
+# MODULE 1 — Form Controls | Multi Selects — Selección de varias opciones
+# Comprueba que un <select multiple> admite varias marcas simultáneamente.
+def test_multiselect_clothing_brands(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Seleccionamos tres opciones mediante sus atributos HTML value.
+    form_page.select_clothing_brands(["nike", "adidas", "puma"])
+
+    # to_have_values() comprueba todos los valores seleccionados.
+    expect(form_page.multiselect_colors).to_have_values(
+        ["nike", "adidas", "puma"]
+    )
+
+
+# MODULE 1 — Form Controls | Multi Selects — Textos visibles duplicados
+# Puma y Zara aparecen dos veces: sus value permiten distinguir cada opción.
+def test_multiselect_duplicate_labels(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Seleccionamos cuatro opciones: dos Puma y dos Zara.
+    # Usamos los value y respetamos el orden en el que aparecen en el HTML.
+    form_page.select_clothing_brands(["puma", "zara", "puma-alt", "zara-alt"])
+
+    # Verificamos las cuatro opciones, aunque solo haya dos marcas distintas.
+    expect(form_page.multiselect_colors).to_have_values(
+        ["puma", "zara", "puma-alt", "zara-alt"]
+    )
+
+
+# MODULE 1 — Form Controls | Multi Selects — Sustituir la selección
+# Una segunda llamada a select_option() reemplaza los valores seleccionados.
+def test_multiselect_replace_selection(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Seleccionamos inicialmente Nike y Adidas.
+    form_page.select_clothing_brands(["nike", "adidas"])
+
+    # Verificamos la selección inicial.
+    expect(form_page.multiselect_colors).to_have_values(
+        ["nike", "adidas"]
+    )
+
+    # Sustituimos la selección anterior por Puma y Zara.
+    form_page.select_clothing_brands(["puma", "zara"])
+
+    # Solo Puma y Zara deben quedar seleccionadas; Nike y Adidas ya no lo están.
+    expect(form_page.multiselect_colors).to_have_values(
+        ["puma", "zara"]
+    )
+
+
+# MODULE 1 — Form Controls | Multi Selects — Limpiar la selección
+# Pasar una lista vacía a select_option() deselecciona todas las opciones.
+def test_multiselect_clear_selection(practice_page: Page):
+    form_page = FormControlsPage(practice_page)
+
+    # Seleccionamos inicialmente Nike y Adidas.
+    form_page.select_clothing_brands(["nike", "adidas"])
+
+    # Comprobamos que ambas opciones están seleccionadas.
+    expect(form_page.multiselect_colors).to_have_values(
+        ["nike", "adidas"]
+    )
+
+    # Enviamos una lista vacía para deseleccionar todas las opciones.
+    form_page.select_clothing_brands([])
+
+    # La lista esperada también está vacía: no queda ninguna seleccionada.
+    expect(form_page.multiselect_colors).to_have_values([])
+
+
 # MODULE 1 — Form Controls | Hidden Elements & AJAX — Toggle Input Box 2
 # Comprueba el estado inicial y que cada pulsación alterna la visibilidad y el mensaje de estado.
 def test_toggle_input_box_2(practice_page: Page):
@@ -274,4 +348,3 @@ def test_load_ajax_content(practice_page: Page):
 
 # Alternativa menos específica: comprobar que el contenedor incluye el texto.
 # expect(form_page.ajax_content).to_contain_text("AJAX Content Loaded")
-
