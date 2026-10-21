@@ -198,7 +198,7 @@ def test_dynamic_table_goals_header(practice_page: Page):
 
     # Buscamos la posición de Goals dentro de la lista.
     # Si no existe, index() lanzará un ValueError.
-    goals_index = header_texts.index("Goals")
+    goals_index = header_texts.index("GOALS")
 
     print("Índice de Goals:", goals_index)
 
