@@ -124,3 +124,52 @@ def test_close_popup_window(practice_page: Page):
     assert popup.is_closed()
 
     assert not practice_page.is_closed()
+
+def test_popup_pages_count(practice_page: Page):
+
+    browser_context_page = BrowserContextPage(practice_page)
+    context = practice_page.context
+
+    with practice_page.expect_popup() as popup_info:
+        browser_context_page.click_open_window()
+
+    popup = popup_info.value
+
+    assert len(context.pages) == 2
+
+    popup.close()
+
+    assert len(context.pages) == 1
+
+def test_original_page_and_popup(practice_page: Page):
+    browser_context_page = BrowserContextPage(practice_page)
+
+    with practice_page.expect_popup() as popup_info:
+        browser_context_page.click_open_window()
+
+    popup = popup_info.value
+
+    expect(popup).to_have_url("https://mobilewright.dev/")
+    expect(practice_page).to_have_url("https://www.playwrightautomation.com/practice.html")
+
+    popup.close()
+
+    assert not practice_page.is_closed()
+
+def test_original_page_remains_in_context(practice_page: Page):
+    browser_context_page = BrowserContextPage(practice_page)
+
+    context = practice_page.context
+
+    with practice_page.expect_popup() as popup_info:
+        browser_context_page.click_open_window()
+
+    popup = popup_info.value
+
+    assert len(context.pages) == 2
+
+    popup.close()
+
+    assert len(context.pages) == 1
+    assert practice_page in context.pages
+
