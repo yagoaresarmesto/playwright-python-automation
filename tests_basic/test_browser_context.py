@@ -1,8 +1,9 @@
 """Módulo 6 — Browser Context, Tabs & Windows."""
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, Browser
 
 from pages.browser_context_page import BrowserContextPage
+from tests_basic.conftest import practice_page
 
 
 # Ejercicio 45 — Abrir una segunda pestaña y validar su título.
@@ -144,3 +145,106 @@ def test_original_page_remains_in_context(practice_page: Page):
 
     assert len(context.pages) == 1
     assert practice_page in context.pages
+
+# Ejercicio 58 — Interactuar con una segunda pestaña.
+def test_interact_with_new_tab(practice_page: Page):
+    browser_context_page = BrowserContextPage(practice_page)
+    context = practice_page.context
+
+    with context.expect_page() as new_page_info:
+        browser_context_page.click_open_tab()
+
+    new_page = new_page_info.value
+
+    expect(new_page).to_have_url("https://playwright.dev/")
+
+    get_started_link = new_page.get_by_role("link", name="Get started")
+
+    expect(get_started_link).to_be_visible()
+
+# Ejercicio 59 — Navegar desde una segunda pestaña.
+def test_navigate_from_new_tab(practice_page: Page):
+    browser_context_page = BrowserContextPage(practice_page)
+    context = practice_page.context
+
+    with context.expect_page() as new_page_info:
+        browser_context_page.click_open_tab()
+
+    new_page = new_page_info.value
+
+    expect(new_page).to_have_url("https://playwright.dev/")
+
+    get_started_link = new_page.get_by_role("link", name="Get started")
+
+    expect(get_started_link).to_be_visible()
+
+    get_started_link.click()
+
+    expect(new_page).to_have_url("https://playwright.dev/docs/intro")
+
+# Ejercicio 60 — Interactuar con la página original tras cerrar otra pestaña.
+def test_return_to_original_page(practice_page: Page):
+    browser_context_page = BrowserContextPage(practice_page)
+    context = practice_page.context
+
+    with context.expect_page() as new_page_info:
+        browser_context_page.click_open_tab()
+
+    new_page = new_page_info.value
+
+    expect(new_page).to_have_url("https://playwright.dev/")
+
+    new_page.close()
+
+    assert not practice_page.is_closed()
+
+    with context.expect_page() as second_tab_info:
+        browser_context_page.click_open_tab()
+
+    second_tab = second_tab_info.value
+
+    expect(second_tab).to_have_url("https://playwright.dev/")
+
+    assert not practice_page.is_closed()
+
+# Ejercicio 61 — Comprobar el contexto de una nueva pestaña.
+def test_new_tab_shares_context(practice_page: Page):
+    browser_context_page = BrowserContextPage(practice_page)
+
+    with practice_page.context.expect_page() as new_page_info:
+        browser_context_page.click_open_tab()
+
+    new_page = new_page_info.value
+
+    assert practice_page.context is new_page.context
+
+def test_independent_contexts(browser: Browser):
+    context_a = browser.new_context()
+    context_b = browser.new_context()
+
+    page_a = context_a.new_page()
+    page_b = context_b.new_page()
+
+    try:
+        assert page_a.context is not page_b.context
+    finally:
+        context_a.close()
+        context_b.close()
+
+
+# Ejercicio 63 — Comprobar el aislamiento de páginas entre contextos.
+def test_pages_are_isolated_between_contexts(browser: Browser):
+    context_a = browser.new_context()
+    context_b = browser.new_context()
+
+    page_a = context_a.new_page()
+    page_b = context_b.new_page()
+
+    try:
+        assert page_a in context_a.pages
+        assert page_a not in context_b.pages
+        assert page_b in context_b.pages
+
+    finally:
+        context_a.close()
+        context_b.close()
