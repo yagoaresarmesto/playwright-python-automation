@@ -248,3 +248,134 @@ def test_pages_are_isolated_between_contexts(browser: Browser):
     finally:
         context_a.close()
         context_b.close()
+
+# Ejercicio 64 — Comprobar el aislamiento de cookies.
+def test_cookies_are_isolated_between_contexts(browser: Browser):
+    context_a = browser.new_context()
+    context_b = browser.new_context()
+
+    try:
+        context_a.add_cookies([
+            {
+                "name": "usuario",
+                "value": "QA_Automation",
+                "url": "https://example.com"
+            }
+        ])
+
+        cookies_a = context_a.cookies()
+        cookies_b = context_b.cookies()
+
+        assert cookies_a[0]["name"] == "usuario"
+        assert cookies_a[0]["value"] == "QA_Automation"
+        assert cookies_b == []
+
+    finally:
+        context_a.close()
+        context_b.close()
+
+# Ejercicio 65 — Eliminar cookies de un contexto.
+def test_clear_context_cookies(browser: Browser):
+    context = browser.new_context()
+
+    try:
+        context.add_cookies([
+            {
+                "name": "usuario",
+                "value": "QA_Automation",
+                "url": "https://example.com"
+            }
+        ])
+        assert len(context.cookies()) == 1
+        context.clear_cookies()
+        assert context.cookies() == []
+
+
+    finally:
+       context.close()
+
+
+# Ejercicio 66 — Inspeccionar el Storage State.
+def test_inspect_storage_state(browser: Browser):
+    context = browser.new_context()
+
+    try:
+        context.add_cookies([
+            {
+                "name": "usuario",
+                "value": "QA_Automation",
+                "url": "https://example.com"
+            }
+        ])
+        state = context.storage_state()
+        print(state)
+        assert state["cookies"][0]["value"] == "QA_Automation"
+
+    finally:
+        context.close()
+
+# Ejercicio 67 — Guardar el Storage State en JSON.
+def test_save_storage_state(browser: Browser):
+    context = browser.new_context()
+
+    try:
+        context.add_cookies([
+            {
+                "name": "usuario",
+                "value": "QA_Automation",
+                "url": "https://example.com"
+            }
+        ])
+        context.storage_state(path="storage_state.json")
+
+    finally:
+        context.close()
+
+# Ejercicio 68 — Cargar el Storage State desde JSON.
+def test_load_storage_state(browser: Browser):
+    context = browser.new_context(storage_state="storage_state.json")
+
+    try:
+        cookies = context.cookies()
+        assert cookies[0]["name"] == "usuario"
+        assert cookies[0]["value"] == "QA_Automation"
+
+    finally:
+        context.close()
+
+# Ejercicio 69 — Comprobar el aislamiento al cargar Storage State.
+def test_storage_state_isolated_between_contexts(browser: Browser):
+    context_a = browser.new_context(storage_state="storage_state.json")
+    context_b = browser.new_context()
+
+    try:
+        cookies_a = context_a.cookies()
+        cookies_b = context_b.cookies()
+
+        assert cookies_a[0]["name"] == "usuario"
+        assert cookies_a[0]["value"] == "QA_Automation"
+        assert cookies_b == []
+
+    finally:
+        context_a.close()
+        context_b.close()
+
+# Ejercicio 70 — Recuperar una sesión después de limpiar cookies.
+def test_restore_cookies_after_clearing_context(browser: Browser):
+    context_a = browser.new_context(storage_state="storage_state.json")
+    context_b = browser.new_context(storage_state="storage_state.json")
+
+    try:
+        cookies_a = context_a.cookies()
+        assert cookies_a[0]["name"] == "usuario"
+        context_a.clear_cookies()
+        assert context_a.cookies() == []
+
+        cookies_b = context_b.cookies()
+        assert cookies_b[0]["name"] == "usuario"
+        assert cookies_b[0]["value"] == "QA_Automation"
+
+
+    finally:
+        context_a.close()
+        context_b.close()

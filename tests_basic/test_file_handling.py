@@ -90,5 +90,3 @@ def test_multiple_files_upload_reset(practice_page: Page):
     expect(file_handling.multiple_status).to_be_empty()
     expect(file_handling.multiple_count).to_have_text("0")
     expect(file_handling.multiple_upload).to_have_value("")
-
-
