@@ -15,5 +15,9 @@ __pycache__/
 test-results/
 playwright-report/
 
+# Saved authentication and session state
+storage_state.json
+playwright/.auth/
+
 # Downloaded browser files
 chrome-win64.zip
